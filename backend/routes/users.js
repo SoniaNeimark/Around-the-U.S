@@ -13,7 +13,7 @@ const {
   userBodyValidation,
   avatarBodyValidation,
   validateRequest,
-} = require('../helpers/requestsValidation');
+} = require('../helpers/requestValidation');
 
 const {
   getUsers,

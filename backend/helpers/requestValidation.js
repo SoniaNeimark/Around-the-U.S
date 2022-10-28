@@ -8,7 +8,7 @@ const validateURL = (value, helpers) => {
   return helpers.error('string.uri');
 };
 
-const string = Joi.string().required().min(2).max(30);
+const string = Joi.string().required().min(2);
 const url = Joi.string().required().custom(validateURL);
 const password = Joi.string().required().min(8);
 const email = Joi.string().email().required();
@@ -17,7 +17,7 @@ const email = Joi.string().email().required();
 const headersObjKeys = {
   authorization: Joi.string()
     .required()
-    .regex(/(Bearer)\s{1}(a-zA-Z0-9)+/),
+    .regex(/(Bearer)\s{1}[.\w\d]*/),
 };
 
 const headersValidation = {
@@ -53,6 +53,7 @@ const userBodyValidation = {
   body: Joi.object().keys(userBodyObjKeys),
 };
 
+//  userCredentials body
 const userCredentialsBodyObjKeys = {
   email,
   password,
@@ -74,11 +75,11 @@ const avatarBodyValidation = {
 const validateRequest = (validationObj) => celebrate(validationObj);
 
 module.exports = {
-  cardBodyValidation,
   headersValidation,
   paramsValidation,
+  userCredentialsBodyValidation,
   userBodyValidation,
   avatarBodyValidation,
-  userCredentialsBodyValidation,
+  cardBodyValidation,
   validateRequest,
 };

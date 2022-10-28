@@ -5,7 +5,7 @@ const {
   headersValidation,
   paramsValidation,
   validateRequest,
-} = require('../helpers/requestsValidation');
+} = require('../helpers/requestValidation');
 const {
   getCards,
   createCard,
