@@ -18,7 +18,7 @@ const app = express();
 app.use(helmet());
 mongoose.connect('mongodb://localhost:27017/aroundb');
 
-const { PORT = 3000 } = process.env;
+const { PORT = 3001 } = process.env;
 
 app.use(express.json());
 
@@ -27,13 +27,13 @@ app.use(requestLogger);
 app.post(
   '/signin',
   validateRequest({ ...userCredentialsBodyValidation }),
-  login
+  login,
 );
 
 app.post(
   '/signup',
   validateRequest({ ...userCredentialsBodyValidation }),
-  createUser
+  createUser,
 );
 
 app.use(auth);
@@ -58,9 +58,9 @@ app.use((err, req, res, next) => {
         iff(
           err.name === 'ValidationError',
           400,
-          err.name === 'JsonWebTokenError' ? 401 : 500
-        )
-      )
+          err.name === 'JsonWebTokenError' ? 401 : 500,
+        ),
+      ),
     )
     .send(`${err.name} error: ${err.message}`);
 });
