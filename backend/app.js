@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const helmet = require('helmet');
 const process = require('node:process');
 const { errors } = require('celebrate');
+const cors = require('cors');
 const { requestLogger, errorLogger } = require('./middlewares/Logger');
 const usersRout = require('./routes/users');
 const cardsRout = require('./routes/cards');
@@ -14,15 +15,20 @@ const {
   validateRequest,
 } = require('./helpers/requestValidation');
 
+
 const app = express();
 app.use(helmet());
 mongoose.connect('mongodb://localhost:27017/aroundb');
 
-const { PORT = 3001 } = process.env;
+const { PORT = 3000, BASE_PATH } = process.env;
 
 app.use(express.json());
 
 app.use(requestLogger);
+
+app.use(cors());
+
+app.options('*', cors());
 
 app.post(
   '/signin',
@@ -49,6 +55,7 @@ app.use(errorLogger);
 app.use(errors());
 
 app.use((err, req, res, next) => {
+console.log(`oops: ${err.name} ${err.message}`)
   const iff = (condition, then, otherwise) => (condition ? then : otherwise);
   res
     .status(
@@ -62,9 +69,9 @@ app.use((err, req, res, next) => {
         ),
       ),
     )
-    .send(`${err.name} error: ${err.message}`);
+    .send(`caught ${err.name} error: ${err.message}`);
 });
 
 app.listen(PORT);
 
-console.log(`Listening to port${PORT}`);
+console.log(`Listening to port${PORT} ${BASE_PATH}`);

@@ -40,7 +40,7 @@ const createCard = (req, res, next) => {
     Card,
     { name: req.body.name, link: req.body.link, owner: req.user._id },
     true,
-    next,
+    next
   );
 };
 
@@ -52,7 +52,7 @@ const updateCard = (req, res, next) => {
     req.params.id,
     { name: req.body.name, link: req.body.link },
     false,
-    next,
+    next
   );
 };
 
@@ -61,7 +61,7 @@ const addLike = (req, res, next) => {
     .then((item) => {
       if (item) {
         if (!item.likes.includes(req.user._id)) {
-          updateItem(
+          return updateItem(
             req,
             res,
             Card,
@@ -70,12 +70,22 @@ const addLike = (req, res, next) => {
               $addToSet: { likes: req.user._id },
             },
             true,
-            next,
+            next
           );
-        } else {
-          throwAlreadyLikedError();
+          /*.then((newItem) =>
+              newItem ? res.send(newItem) : throwNotFoundError()
+            )
+            .catch(next);*/
         }
+        res.send(item);
+
+        //Card.findById(req.params.id)
+
+        /* else {
+          throwAlreadyLikedError();
+        }*/
       }
+      return;
     })
     .catch(next);
 };
@@ -84,10 +94,8 @@ const deleteLike = (req, res, next) => {
   Card.findById(req.params.id)
     .then((item) => {
       if (item) {
-        if (!item.likes.includes(req.user._id)) {
-          throwAlreadyUnlikedError();
-        } else {
-          updateItem(
+        if (item.likes.includes(req.user._id)) {
+          return updateItem(
             req,
             res,
             Card,
@@ -96,10 +104,17 @@ const deleteLike = (req, res, next) => {
               $pull: { likes: `${req.user._id}` },
             },
             true,
-            next,
+            next
           );
         }
+        res.send(item);
+
+        /*.then((newItem) =>
+            newItem ? res.send(newItem) : throwNotFoundError()
+          )
+          .catch(next);*/
       }
+      return
     })
     .catch(next);
 };

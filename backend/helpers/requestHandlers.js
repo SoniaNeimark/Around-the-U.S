@@ -20,7 +20,7 @@ const createItem = (req, res, model, params, card, next) => {
 };
 
 // Update
-const updateItem = (req, res, model, id, reqParams, likes, next) => {
+const updateItem = (req, res, model, id, reqBody, likes, next) => {
   model
     .findById(id)
     .then((item) => {
@@ -31,7 +31,7 @@ const updateItem = (req, res, model, id, reqParams, likes, next) => {
         throwNotOwnerError();
       } else {
         model
-          .findByIdAndUpdate(id, reqParams, paramsFindAndUpdate)
+          .findByIdAndUpdate(id, reqBody, paramsFindAndUpdate)
           .then((sameItem) => {
             res.send({ data: sameItem });
           })

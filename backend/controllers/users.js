@@ -36,7 +36,7 @@ const getCurrrentUser = (req, res, next) => {
       if (!user) {
         throwNotFoundError();
       }
-      res.send({ data: user });
+      res.send(user);
     })
     .catch(next);
 };
@@ -98,7 +98,7 @@ const login = (req, res, next) => {
           expiresIn: '7d',
         },
       );
-      res.send(token);
+      res.send({ token: token });
     })
     .catch(next);
 };
