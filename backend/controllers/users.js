@@ -101,7 +101,6 @@ const login = (req, res, next) => {
           expiresIn: '7d',
         },
       );
-      console.log(NODE_ENV + " " + JWT_SECRET)
       res.send({ token: token });
     })
     .catch(next);
