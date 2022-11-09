@@ -3,6 +3,7 @@ const invalidEmailOrPasswordCode = 401;
 const unauthorizedCode = 403;
 const notFoundCode = 404;
 const userExistsCode = 409;
+const serverErrorCode = 500;
 
 //  400
 const throwAlreadyLikedError = () => {
@@ -48,12 +49,16 @@ const throwNotOwnerError = () => {
 };
 
 //  404
-const throwNotFoundError = () => {
+const notFoundError = () => {
   const error = new Error('Not found');
   error.name = 'NotFound';
   error.statusCode = notFoundCode;
   error.message = 'Requested resource not found.';
-  throw error;
+  return error;
+};
+
+const throwNotFoundError = () => {
+  throw notFoundError();
 };
 
 //  409
@@ -65,6 +70,15 @@ const throwAlreadyExistsError = () => {
   throw error;
 };
 
+//  500
+const throwServerError = () => {
+  const error = new Error('Server Error');
+  error.name = 'ServerError';
+  error.message = 'An error occured on the server';
+  error.statusCode = serverErrorCode;
+  throw error;
+};
+
 module.exports = {
   throwAlreadyLikedError,
   throwAlreadyUnlikedError,
@@ -72,5 +86,7 @@ module.exports = {
   throwEmailOrPasswordError,
   throwAlreadyExistsError,
   throwNotFoundError,
+  notFoundError,
   throwAuthorizatiionError,
+  throwServerError,
 };

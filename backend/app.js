@@ -15,12 +15,11 @@ const {
   validateRequest,
 } = require('./helpers/requestValidation');
 
-
 const app = express();
 app.use(helmet());
 mongoose.connect('mongodb://localhost:27017/aroundb');
 
-const { PORT = 3000, BASE_PATH } = process.env;
+const { PORT = 3000 } = process.env;
 
 app.use(express.json());
 
@@ -61,7 +60,6 @@ app.use(errorLogger);
 app.use(errors());
 
 app.use((err, req, res, next) => {
-console.log(`oops: ${err.name} ${err.message}`)
   const iff = (condition, then, otherwise) => (condition ? then : otherwise);
   res
     .status(
@@ -75,10 +73,9 @@ console.log(`oops: ${err.name} ${err.message}`)
         ),
       ),
     )
-    .send(`caught ${err.name} error: ${err.message}`);
+    .send({ message: `caught ${err.name} error: ${err.message}` });
 });
 
 app.listen(PORT);
 
 console.log(`Listening to port${PORT}`);
-// test

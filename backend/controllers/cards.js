@@ -1,120 +1,77 @@
 const {
+  findItemById,
   createItem,
   deleteItem,
   updateItem,
+  testIfOwner,
 } = require('../helpers/requestHandlers');
-const {
-  throwAlreadyUnlikedError,
-  throwAlreadyLikedError,
-  throwNotFoundError,
-} = require('../helpers/errors');
+const { notFoundError, throwNotOwnerError } = require('../helpers/errors');
 
 const Card = require('../models/card');
 
 const getCards = (req, res, next) => {
   Card.find({})
+    .orFail(notFoundError())
     .then((value) => {
-      if (!value) {
-        throwNotFoundError();
-      }
       res.send(value);
     })
     .catch(next);
 };
 
 const getCardById = (req, res, next) => {
+  findItemById(req, res, next, Card);
+};
+
+const createCard = (req, res, next) => {
+  createItem(req, res, next, Card, {
+    name: req.body.name,
+    link: req.body.link,
+    owner: req.user._id,
+  });
+};
+
+const updateCard = (req, res, next) => {
   Card.findById(req.params.id)
+    .orFail(notFoundError())
     .then((item) => {
-      if (!item) {
-        throwNotFoundError();
+      if (testIfOwner(req, item)) {
+        updateItem(req, res, next, Card, {
+          name: req.body.name,
+          link: req.body.link,
+        });
+        return;
       }
-      res.send({ data: item });
+      throwNotOwnerError();
     })
     .catch(next);
 };
 
-const createCard = (req, res, next) => {
-  createItem(
-    req,
-    res,
-    Card,
-    { name: req.body.name, link: req.body.link, owner: req.user._id },
-    true,
-    next
-  );
-};
-
-const updateCard = (req, res, next) => {
-  updateItem(
-    req,
-    res,
-    Card,
-    req.params.id,
-    { name: req.body.name, link: req.body.link },
-    false,
-    next
-  );
-};
-
 const addLike = (req, res, next) => {
   Card.findById(req.params.id)
+    .orFail(notFoundError())
     .then((item) => {
-      if (item) {
-        if (!item.likes.includes(req.user._id)) {
-          return updateItem(
-            req,
-            res,
-            Card,
-            req.params.id,
-            {
-              $addToSet: { likes: req.user._id },
-            },
-            true,
-            next
-          );
-          /*.then((newItem) =>
-              newItem ? res.send(newItem) : throwNotFoundError()
-            )
-            .catch(next);*/
-        }
-        res.send(item);
-
-        //Card.findById(req.params.id)
-
-        /* else {
-          throwAlreadyLikedError();
-        }*/
+      if (!item.likes.includes(req.user._id)) {
+        updateItem(req, res, next, Card, {
+          $addToSet: { likes: req.user._id },
+        });
+        return;
       }
-      return;
+      res.send(item);
     })
     .catch(next);
 };
 
 const deleteLike = (req, res, next) => {
   Card.findById(req.params.id)
+    .orFail(notFoundError())
     .then((item) => {
-      if (item) {
-        if (item.likes.includes(req.user._id)) {
-          return updateItem(
-            req,
-            res,
-            Card,
-            req.params.id,
-            {
-              $pull: { likes: `${req.user._id}` },
-            },
-            true,
-            next
-          );
-        }
-        res.send(item);
-
-        /*.then((newItem) =>
-            newItem ? res.send(newItem) : throwNotFoundError()
-          )
-          .catch(next);*/
+      if (item.likes.includes(req.user._id)) {
+        updateItem(req, res, next, Card, {
+          $pull: { likes: `${req.user._id}` },
+        });
+        return;
       }
-      return
+      res.send(item);
     })
     .catch(next);
 };

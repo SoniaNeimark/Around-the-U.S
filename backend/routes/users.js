@@ -19,7 +19,6 @@ const {
   getUsers,
   getUserById,
   updateUser,
-  getCurrrentUser,
   updateAvatar,
 } = require('../controllers/users');
 
@@ -34,7 +33,7 @@ router.get(
 router.get(
   ownerProfile,
   validateRequest({ ...headersValidation }),
-  getCurrrentUser,
+  getUserById,
 );
 
 router.get(

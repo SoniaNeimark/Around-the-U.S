@@ -1,46 +1,28 @@
-require('dotenv').config()
+require('dotenv').config();
+
 const { NODE_ENV, JWT_SECRET } = process.env;
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 
-const { createItem, updateItem } = require('../helpers/requestHandlers');
 const {
-  throwAlreadyExistsError,
-  throwNotFoundError,
-} = require('../helpers/errors');
+  createItem,
+  updateItem,
+  findItemById,
+} = require('../helpers/requestHandlers');
+const { throwAlreadyExistsError, notFoundError } = require('../helpers/errors');
 
 const getUsers = (req, res, next) => {
   User.find({})
+    .orFail(notFoundError())
     .then((value) => {
-      if (!value) {
-        throwNotFoundError();
-      }
       res.send(value);
     })
     .catch(next);
 };
 
 const getUserById = (req, res, next) => {
-  User.findById(req.params.id)
-    .then((item) => {
-      if (!item) {
-        throwNotFoundError();
-      }
-      res.send({ data: item });
-    })
-    .catch(next);
-};
-
-const getCurrrentUser = (req, res, next) => {
-  User.findById(req.user._id)
-    .then((user) => {
-      if (!user) {
-        throwNotFoundError();
-      }
-      res.send(user);
-    })
-    .catch(next);
+  findItemById(req, res, next, User);
 };
 
 const createUser = (req, res, next) => {
@@ -51,41 +33,24 @@ const createUser = (req, res, next) => {
       }
       bcrypt
         .hash(req.body.password, 10)
-        .then((hash) => createItem(
-          req,
-          res,
-          User,
-          { email: req.body.email, password: hash },
-          false,
-          next,
-        ))
+        .then((hash) => createItem(req, res, next, User, {
+          email: req.body.email,
+          password: hash,
+        }))
         .catch(next);
     })
     .catch(next);
 };
 
 const updateUser = (req, res, next) => {
-  updateItem(
-    req,
-    res,
-    User,
-    req.user._id,
-    { name: req.body.name, about: req.body.about },
-    false,
-    next,
-  );
+  updateItem(req, res, next, User, {
+    name: req.body.name,
+    about: req.body.about,
+  });
 };
 
 const updateAvatar = (req, res, next) => {
-  updateItem(
-    req,
-    res,
-    User,
-    req.user._id,
-    { avatar: req.body.avatar },
-    false,
-    next,
-  );
+  updateItem(req, res, next, User, { avatar: req.body.avatar });
 };
 
 const login = (req, res, next) => {
@@ -96,12 +61,11 @@ const login = (req, res, next) => {
       const token = jwt.sign(
         { _id: user._id },
         NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
-        //'90b40bed422117701b7310e020d6202b',
         {
           expiresIn: '7d',
         },
       );
-      res.send({ token: token });
+      res.send({ token });
     })
     .catch(next);
 };
@@ -113,5 +77,4 @@ module.exports = {
   updateUser,
   updateAvatar,
   login,
-  getCurrrentUser,
 };
