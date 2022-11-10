@@ -1,4 +1,5 @@
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const mongoose = require('mongoose');
 const helmet = require('helmet');
 const process = require('node:process');
@@ -18,6 +19,12 @@ const {
 const app = express();
 app.use(helmet());
 mongoose.connect('mongodb://localhost:27017/aroundb');
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 const { PORT = 3000 } = process.env;
 
@@ -29,6 +36,8 @@ app.use(cors());
 
 app.options('*', cors());
 
+app.use(limiter);
+
 app.get('/crash-test', () => {
   setTimeout(() => {
     throw new Error('Server will crash now');
@@ -38,13 +47,13 @@ app.get('/crash-test', () => {
 app.post(
   '/signin',
   validateRequest({ ...userCredentialsBodyValidation }),
-  login,
+  login
 );
 
 app.post(
   '/signup',
   validateRequest({ ...userCredentialsBodyValidation }),
-  createUser,
+  createUser
 );
 
 app.use(auth);
@@ -69,9 +78,9 @@ app.use((err, req, res, next) => {
         iff(
           err.name === 'ValidationError',
           400,
-          err.name === 'JsonWebTokenError' ? 401 : 500,
-        ),
-      ),
+          err.name === 'JsonWebTokenError' ? 401 : 500
+        )
+      )
     )
     .send({ message: `caught ${err.name} error: ${err.message}` });
 });
