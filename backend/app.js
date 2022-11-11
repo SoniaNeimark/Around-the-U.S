@@ -47,13 +47,13 @@ app.get('/crash-test', () => {
 app.post(
   '/signin',
   validateRequest({ ...userCredentialsBodyValidation }),
-  login
+  login,
 );
 
 app.post(
   '/signup',
   validateRequest({ ...userCredentialsBodyValidation }),
-  createUser
+  createUser,
 );
 
 app.use(auth);
@@ -78,9 +78,9 @@ app.use((err, req, res, next) => {
         iff(
           err.name === 'ValidationError',
           400,
-          err.name === 'JsonWebTokenError' ? 401 : 500
-        )
-      )
+          err.name === 'JsonWebTokenError' ? 401 : 500,
+        ),
+      ),
     )
     .send({ message: `caught ${err.name} error: ${err.message}` });
 });
