@@ -8,8 +8,6 @@
 
 * And the contents of the /build folder (the [/frontend folder](https://github.com/SoniaNeimark/react-around-api-full/tree/main/frontend)) of the React application which uses this API and is created in a [separate repository](https://github.com/SoniaNeimark/react-around-auth.git). It is deployed to [the same server](https://sonia-around.students.nomoredomainssbs.ru) where the API is hosted.
 
-Link to the website: https://sonia-around.students.nomoredomainssbs.ru
-
 ## Brief UX description
 "Around the U.S." is actually a gallery of images, uploaded by users. Users have to log in to see the gallery. The users can register, log in, log out, edit their profiles, add and delete cards with images, add and remove likes to the existing cards. Once they have logged in from their devices, there is no need to reenter email and password to get to the gallery page, though if they log out or don't use the application for 7 days, they would have to log in again.
 
