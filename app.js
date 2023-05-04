@@ -18,7 +18,7 @@ const {
 
 const app = express();
 app.use(helmet());
-mongoose.connect('mongodb://localhost:27017/aroundb');
+mongoose.connect('mongodb+srv://nameark:OghMMTyCTTxucMn5@cluster0.3rycw9l.mongodb.net/?retryWrites=true&w=majority');
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
