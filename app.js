@@ -1,5 +1,4 @@
 const express = require('express');
-const rateLimit = require('express-rate-limit');
 const mongoose = require('mongoose');
 const helmet = require('helmet');
 const process = require('node:process');
@@ -15,34 +14,20 @@ const {
   userCredentialsBodyValidation,
   validateRequest,
 } = require('./helpers/requestValidation');
+const { PORT = 3000, DB_URI } = process.env;
 
-const app = express();
 app.use(helmet());
-mongoose.connect('mongodb+srv://nameark:OghMMTyCTTxucMn5@cluster0.3rycw9l.mongodb.net/?retryWrites=true&w=majority');
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-
-const { PORT = 3000 } = process.env;
+mongoose.connect(DB_URI);
+const limiter = require('./helpers/limiter');
+const app = express();
 
 app.use(express.json());
 
 app.use(requestLogger);
 
-app.use(cors());
-
-app.options('*', cors());
+app.use(cors({ origin: '*' }));
 
 app.use(limiter);
-
-app.get('/crash-test', () => {
-  setTimeout(() => {
-    throw new Error('Server will crash now');
-  }, 0);
-});
 
 app.post(
   '/signin',
