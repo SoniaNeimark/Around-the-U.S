@@ -14,12 +14,12 @@ const {
   userCredentialsBodyValidation,
   validateRequest,
 } = require('./helpers/requestValidation');
+const limiter = require('./helpers/limiter');
 const { PORT = 3000, DB_URI } = process.env;
+const app = express();
 
 app.use(helmet());
 mongoose.connect(DB_URI);
-const limiter = require('./helpers/limiter');
-const app = express();
 
 app.use(express.json());
 
